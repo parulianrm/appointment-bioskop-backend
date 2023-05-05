@@ -34,7 +34,7 @@ export class OrderService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
+          throw new ForbiddenException('Internal Error');
         }
       }
       throw error;

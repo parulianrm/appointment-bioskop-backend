@@ -17,7 +17,7 @@ model Order {
   nama_studio  String
   jam          String
   jumlah_kursi Int
-  biaya_total  Int
+  biaya_total  Int?    @default(0)
   telephone    String? @default("")
   nama         String
   tanggal      String
