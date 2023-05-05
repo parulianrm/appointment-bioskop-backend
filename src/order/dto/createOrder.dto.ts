@@ -38,8 +38,4 @@ export class CreateOrderDTO implements Prisma.OrderCreateInput {
   @IsString()
   @IsNotEmpty()
   kursi: string;
-
-  status?: number;
-
-  statusId?: string;
 }
