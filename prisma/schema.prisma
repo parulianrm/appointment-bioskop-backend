@@ -9,3 +9,20 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Order {
+  id           Int     @id @default(autoincrement())
+  id_film      String
+  name_film    String
+  jam          String
+  jumlah_kursi Int
+  biaya_total  Int
+  telephone    String?
+  nama         String
+  tanggal      String
+  kursi        String
+  status       Int?    @default(1)
+  statusId     String
+
+  @@map("orders")
+}
