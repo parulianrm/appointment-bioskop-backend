@@ -13,7 +13,8 @@ datasource db {
 model Order {
   id           Int     @id @default(autoincrement())
   id_film      String
-  name_film    String
+  nama_film    String
+  nama_studio  String
   jam          String
   jumlah_kursi Int
   biaya_total  Int
@@ -21,8 +22,8 @@ model Order {
   nama         String
   tanggal      String
   kursi        String
-  status       Int?    @default(1)
-  statusId     String
+  status       String? @default("booked")
+  statusId     Int?    @default(1)
 
   @@map("orders")
 }
