@@ -26,7 +26,6 @@ export class OrderService {
   }
 
   async createOrder(body: CreateOrderDTO) {
-    console.log(body.telephone);
     try {
       const result = await this.dbService.order.create({
         data: {
@@ -62,9 +61,10 @@ export class OrderService {
   async updateOrder({ body, id }) {
     try {
       if (body.statusId != 0 && body.statusId != 1) {
-        throw new BadRequestException('Body Status Id must be number 1 or 0', {
+        throw new BadRequestException('Body statusId must be number 1 or 0', {
           cause: new Error(),
-          description: 'Some error description',
+          description:
+            'Hanya boleh menggunakan angka 1 untuk (Booked) dan angka 0 untuk (cancel) ',
         });
       }
 

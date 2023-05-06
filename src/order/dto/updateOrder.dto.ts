@@ -3,17 +3,21 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class UpdateOrderDto {
   @IsNumber()
   @IsNotEmpty()
-  statusId: number;
+  statusId?: number;
 
   @IsNumber()
   @IsNotEmpty()
-  biaya_total: number;
+  biaya_total?: number;
 
   @IsString()
   @IsNotEmpty()
-  nama: string;
+  nama?: string;
 
   @IsString()
   @IsNotEmpty()
-  telephone: string;
+  telephone?: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  statusPaymentId?: number;
 }
