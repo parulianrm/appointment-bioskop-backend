@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDTO } from './dto/createOrder.dto';
 import { Prisma } from '@prisma/client';
+import { UpdateOrderDto } from './dto/updateOrder.dto';
 
 @Injectable()
 export class OrderService {
@@ -13,7 +14,7 @@ export class OrderService {
 
   async getSummaryFilm() {
     const uniqueEmails = await this.dbService.order.groupBy({
-      by: ['nama_film'],
+      by: ['id_film', 'nama_film'],
       _sum: {
         jumlah_kursi: true,
       },
@@ -58,8 +59,11 @@ export class OrderService {
     }
   }
 
-  async updateOrder({ body, id }) {
+  async updateOrder(body: UpdateOrderDto, id: number) {
     try {
+      type UpdateDataType = { status?: string; statusPayment?: string };
+      const updateData: UpdateDataType = {};
+
       if (body.statusId != 0 && body.statusId != 1) {
         throw new BadRequestException('Body statusId must be number 1 or 0', {
           cause: new Error(),
@@ -68,16 +72,23 @@ export class OrderService {
         });
       }
 
-      const status = body.statusId == 0 ? 'cancel' : 'booked';
+      if (body.statusId !== null && body.statusId !== undefined) {
+        updateData.status = body.statusId == 1 ? 'booked' : 'cancel';
+      }
 
-      const updateData = {
-        ...body,
-        status,
-      };
+      if (body.statusPaymentId !== null && body.statusPaymentId !== undefined) {
+        updateData.statusPayment =
+          body.statusPaymentId == 1 ? 'sudah bayar' : 'belum bayar';
+      }
+
+      console.log(updateData);
 
       const result = await this.dbService.order.update({
-        where: { id: Number(id) },
-        data: updateData,
+        where: { id: id },
+        data: {
+          ...body,
+          ...updateData,
+        },
       });
       return {
         status: 'Ok',
