@@ -11,19 +11,21 @@ datasource db {
 }
 
 model Order {
-  id           Int     @id @default(autoincrement())
-  id_film      String
-  nama_film    String
-  nama_studio  String
-  jam          String
-  jumlah_kursi Int
-  biaya_total  Int?    @default(0)
-  telephone    String? @default("")
-  nama         String
-  tanggal      String
-  kursi        String
-  status       String? @default("booked")
-  statusId     Int?    @default(1)
+  id              Int     @id @default(autoincrement())
+  id_film         String
+  nama_film       String
+  nama_studio     String
+  jam             String
+  jumlah_kursi    Int
+  biaya_total     Int?    @default(0)
+  telephone       String? @default("")
+  nama            String
+  tanggal         String
+  kursi           String
+  status          String? @default("booked")
+  statusId        Int?    @default(1)
+  statusPaymentId Int?    @default(0)
+  statusPayment   String? @default("belum bayar")
 
   @@map("orders")
 }
