@@ -6,20 +6,25 @@ import { UpdateOrderDto } from './dto/updateOrder.dto';
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
-  @Get('all')
+  @Get()
   async getAllOrders() {
-    const result = this.orderService.getAllOrder();
-    console.log(result);
+    const result = await this.orderService.getAllOrder();
+    return result;
+  }
+
+  @Get('summary-film')
+  async getSummaryOrders() {
+    const result = await this.orderService.getSummaryFilm();
     return result;
   }
 
   @Post('create')
-  createOrder(@Body() body: CreateOrderDTO) {
-    return this.orderService.createOrder(body);
+  async createOrder(@Body() body: CreateOrderDTO) {
+    return await this.orderService.createOrder(body);
   }
 
   @Put('update/:id')
-  updateOrder(@Body() body: UpdateOrderDto, @Param('id') id) {
-    return this.orderService.updateOrder({ body, id });
+  async updateOrder(@Body() body: UpdateOrderDto, @Param('id') id) {
+    return await this.orderService.updateOrder({ body, id });
   }
 }

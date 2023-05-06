@@ -11,8 +11,18 @@ import { Prisma } from '@prisma/client';
 export class OrderService {
   constructor(private dbService: PrismaService) {}
 
+  async getSummaryFilm() {
+    const uniqueEmails = await this.dbService.order.groupBy({
+      by: ['nama_film'],
+      _sum: {
+        jumlah_kursi: true,
+      },
+    });
+    return uniqueEmails;
+  }
+
   async getAllOrder() {
-    return this.dbService.order.findMany();
+    return await this.dbService.order.findMany();
   }
 
   async createOrder(body: CreateOrderDTO) {
