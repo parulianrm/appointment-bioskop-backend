@@ -32,7 +32,6 @@ export class OrderService {
       },
     });
 
-    console.log(result);
     const jumlah_kursi = result.reduce((sum, item) => {
       return sum + item.jumlah_kursi;
     }, 0);
