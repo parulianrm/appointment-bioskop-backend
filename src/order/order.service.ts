@@ -22,6 +22,14 @@ export class OrderService {
     return uniqueEmails;
   }
 
+  async getUniqueFilm(id) {
+    return await this.dbService.order.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   async getAllOrder() {
     return await this.dbService.order.findMany();
   }

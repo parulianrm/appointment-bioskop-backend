@@ -18,6 +18,11 @@ export class OrderController {
     return result;
   }
 
+  @Get(':id')
+  async getOrderById(@Param('id') id) {
+    return await this.orderService.getUniqueFilm(Number(id));
+  }
+
   @Post('create')
   async createOrder(@Body() body: CreateOrderDTO) {
     return await this.orderService.createOrder(body);

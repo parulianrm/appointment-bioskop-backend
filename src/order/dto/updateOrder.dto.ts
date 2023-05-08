@@ -6,4 +6,5 @@ export class UpdateOrderDto {
   nama?: string;
   telephone?: string;
   statusPaymentId?: number;
+  kursi?: string;
 }
