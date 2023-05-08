@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDTO } from './dto/createOrder.dto';
 import { UpdateOrderDto } from './dto/updateOrder.dto';
@@ -9,6 +9,22 @@ export class OrderController {
   @Get()
   async getAllOrders() {
     const result = await this.orderService.getAllOrder();
+    return result;
+  }
+
+  @Get('booked-ticket/')
+  async getBookedTicket(
+    @Query('id_film') id_film,
+    @Query('nama_studio') nama_studio,
+    @Query('jam') jam,
+    @Query('tanggal') tanggal,
+  ) {
+    const result = await this.orderService.getBookedTicket(
+      id_film,
+      nama_studio,
+      jam,
+      tanggal,
+    );
     return result;
   }
 

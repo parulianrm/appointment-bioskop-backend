@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDTO } from './dto/createOrder.dto';
-import { Prisma } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { UpdateOrderDto } from './dto/updateOrder.dto';
 
 @Injectable()
@@ -22,12 +22,49 @@ export class OrderService {
     return uniqueEmails;
   }
 
-  async getUniqueFilm(id) {
-    return await this.dbService.order.findUnique({
+  async getBookedTicket(id_film, nama_studio, jam, tanggal) {
+    const result = await this.dbService.order.findMany({
       where: {
-        id,
+        id_film: id_film,
+        nama_studio: nama_studio,
+        jam: jam,
+        tanggal: tanggal,
       },
     });
+
+    console.log(result);
+    const jumlah_kursi = result.reduce((sum, item) => {
+      return sum + item.jumlah_kursi;
+    }, 0);
+
+    const kursi_booked = result.reduce((sum, item) => {
+      return `${sum}|${item.kursi}`;
+    }, '');
+
+    return {
+      jumlah_kursi,
+      kursi_booked,
+      nama_studio,
+      id_film,
+    };
+  }
+
+  async getUniqueFilm(id) {
+    try {
+      const result = await this.dbService.order.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!result) {
+        throw new BadRequestException('Bad Request', {
+          description: 'Id tidak ditemukan',
+        });
+      }
+      return result;
+    } catch (err) {
+      return err;
+    }
   }
 
   async getAllOrder() {
