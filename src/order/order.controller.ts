@@ -34,6 +34,12 @@ export class OrderController {
     return result;
   }
 
+  @Get('summary-booking')
+  async getSummaryBooking() {
+    const result = await this.orderService.getSummaryBooking();
+    return result;
+  }
+
   @Get(':id')
   async getOrderById(@Param('id') id) {
     return await this.orderService.getUniqueFilm(Number(id));

@@ -48,6 +48,73 @@ export class OrderService {
     };
   }
 
+  async getSummaryBooking() {
+    let statusCancel: object = {
+      statusName: 'Cancel',
+      value: {
+        _sum: {
+          jumlah_kursi: 0,
+        },
+      },
+    };
+    let statusPaid: object = {
+      statusName: 'Sudah Bayar',
+      value: {
+        _sum: {
+          jumlah_kursi: 0,
+        },
+      },
+    };
+    let statusNotPaid: object = {
+      statusName: 'Belum Bayar',
+      value: {
+        _sum: {
+          jumlah_kursi: 0,
+        },
+      },
+    };
+
+    try {
+      const result = await this.dbService.order.groupBy({
+        by: ['status', 'statusPayment'],
+        _sum: {
+          jumlah_kursi: true,
+        },
+      });
+
+      result.forEach((value) => {
+        if (value.status === 'cancel') {
+          statusCancel = {
+            statusName: 'Cancel',
+            value: {
+              ...value,
+            },
+          };
+        } else {
+          if (value.statusPayment !== 'belum bayar') {
+            statusPaid = {
+              statusName: 'Sudah Bayar',
+              value: {
+                ...value,
+              },
+            };
+          } else {
+            statusNotPaid = {
+              statusName: 'Belum Bayar',
+              value: {
+                ...value,
+              },
+            };
+          }
+        }
+      });
+
+      return [statusPaid, statusCancel, statusNotPaid];
+    } catch (err) {
+      return err;
+    }
+  }
+
   async getUniqueFilm(id) {
     try {
       const result = await this.dbService.order.findUnique({
