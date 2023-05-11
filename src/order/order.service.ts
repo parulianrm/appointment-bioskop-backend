@@ -5,14 +5,43 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDTO } from './dto/createOrder.dto';
-import { Order, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { UpdateOrderDto } from './dto/updateOrder.dto';
+
+type OrderType = {
+  id: number;
+  id_film: string;
+  nama_film: string;
+  nama_studio: string;
+  jam: string;
+  jumlah_kursi: number;
+  biaya_total: number;
+  telephone: string;
+  nama: string;
+  tanggal: string;
+  kursi: string;
+  statusPaymentId?: number;
+  statusPayment?: string;
+};
+
+type SummaryBooking = {
+  statusName: string;
+  value: {
+    _sum: { jumlah_kursi: number };
+  };
+};
 
 @Injectable()
 export class OrderService {
   constructor(private dbService: PrismaService) {}
 
-  async getSummaryFilm() {
+  async getSummaryFilm(): Promise<
+    {
+      _sum: { jumlah_kursi: number };
+      id_film: string;
+      nama_film: string;
+    }[]
+  > {
     const uniqueEmails = await this.dbService.order.groupBy({
       by: ['id_film', 'nama_film'],
       _sum: {
@@ -22,8 +51,18 @@ export class OrderService {
     return uniqueEmails;
   }
 
-  async getBookedTicket(id_film, nama_studio, jam, tanggal) {
-    const result = await this.dbService.order.findMany({
+  async getBookedTicket(
+    id_film,
+    nama_studio,
+    jam,
+    tanggal,
+  ): Promise<{
+    jumlah_kursi: number;
+    kursi_booked: string;
+    nama_studio: string;
+    id_film: string;
+  }> {
+    const result: OrderType[] = await this.dbService.order.findMany({
       where: {
         id_film: id_film,
         nama_studio: nama_studio,
@@ -32,11 +71,11 @@ export class OrderService {
       },
     });
 
-    const jumlah_kursi = result.reduce((sum, item) => {
+    const jumlah_kursi: number = result.reduce((sum, item) => {
       return sum + item.jumlah_kursi;
     }, 0);
 
-    const kursi_booked = result.reduce((sum, item) => {
+    const kursi_booked: string = result.reduce((sum, item) => {
       return `${sum}|${item.kursi}`;
     }, '');
 
@@ -48,8 +87,8 @@ export class OrderService {
     };
   }
 
-  async getSummaryBooking() {
-    let statusCancel: object = {
+  async getSummaryBooking(): Promise<SummaryBooking[]> {
+    let statusCancel: SummaryBooking = {
       statusName: 'Cancel',
       value: {
         _sum: {
@@ -57,7 +96,7 @@ export class OrderService {
         },
       },
     };
-    let statusPaid: object = {
+    let statusPaid: SummaryBooking = {
       statusName: 'Sudah Bayar',
       value: {
         _sum: {
@@ -65,7 +104,7 @@ export class OrderService {
         },
       },
     };
-    let statusNotPaid: object = {
+    let statusNotPaid: SummaryBooking = {
       statusName: 'Belum Bayar',
       value: {
         _sum: {
@@ -115,7 +154,7 @@ export class OrderService {
     }
   }
 
-  async getUniqueFilm(id) {
+  async getUniqueFilm(id): Promise<OrderType> {
     try {
       const result = await this.dbService.order.findUnique({
         where: {
@@ -133,11 +172,15 @@ export class OrderService {
     }
   }
 
-  async getAllOrder() {
+  async getAllOrder(): Promise<OrderType[]> {
     return await this.dbService.order.findMany();
   }
 
-  async createOrder(body: CreateOrderDTO) {
+  async createOrder(body: CreateOrderDTO): Promise<{
+    status: string;
+    messages: string;
+    data: OrderType;
+  }> {
     try {
       const result = await this.dbService.order.create({
         data: {
@@ -170,7 +213,14 @@ export class OrderService {
     }
   }
 
-  async updateOrder(body: UpdateOrderDto, id: number) {
+  async updateOrder(
+    body: UpdateOrderDto,
+    id: number,
+  ): Promise<{
+    status: string;
+    message: string;
+    data: OrderType;
+  }> {
     try {
       type UpdateDataType = { status?: string; statusPayment?: string };
       const updateData: UpdateDataType = {};
@@ -191,8 +241,6 @@ export class OrderService {
         updateData.statusPayment =
           body.statusPaymentId == 1 ? 'sudah bayar' : 'belum bayar';
       }
-
-      console.log(updateData);
 
       const result = await this.dbService.order.update({
         where: { id: id },
